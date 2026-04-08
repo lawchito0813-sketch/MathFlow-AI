@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>學生作答批改｜困難版</title>
+    <link rel="stylesheet" href="/katex.min.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel">
+        <div class="page-switcher">
+          <a class="mode-link" href="/">AI 解題｜困難版</a>
+          <a class="mode-link" href="/simple">AI 解題｜簡單版</a>
+          <a class="mode-link active" href="/review">學生批改｜困難版</a>
+          <a class="mode-link" href="/review-simple">學生批改｜簡單版</a>
+          <a class="mode-link" href="/paper-review">整卷批改</a>
+          <a class="mode-link" href="/dse-author">DSE 出卷</a>
+        </div>
+        <h1>學生作答批改｜困難版</h1>
+        <p class="subtitle">輸入題目、學生解題過程與可選的學生答案，按 DSE Core Math 語境批改，並支援追問、畫圖建議、自動作圖與渲染講解。</p>
+
+        <form id="review-form" class="form review-form-grid">
+          <label class="field">
+            <span>API 提供者</span>
+            <select id="provider-select"></select>
+          </label>
+
+          <label class="field">
+            <span>題目文字</span>
+            <textarea id="problem-text" rows="5" placeholder="輸入題目文字；如上傳題目圖片則留空。"></textarea>
+          </label>
+
+          <label class="field">
+            <span>或上傳題目圖片</span>
+            <input id="problem-image" type="file" accept="image/*" />
+          </label>
+
+          <label class="field">
+            <span>學生解題過程文字</span>
+            <textarea id="work-text" rows="7" placeholder="輸入學生的作答步驟；如上傳圖片則留空。"></textarea>
+          </label>
+
+          <label class="field">
+            <span>或上傳學生解題過程圖片</span>
+            <input id="work-image" type="file" accept="image/*" />
+          </label>
+
+          <label class="field">
+            <span>學生最終答案（可選）</span>
+            <textarea id="answer-text" rows="3" placeholder="可留空；如上傳答案圖片則留空。"></textarea>
+          </label>
+
+          <label class="field">
+            <span>或上傳學生答案圖片（可選）</span>
+            <input id="answer-image" type="file" accept="image/*" />
+          </label>
+
+          <div class="actions full-width">
+            <button id="review-button" type="submit">開始批改</button>
+            <button id="diagram-button" type="button" disabled>生成圖形</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h2>流程時間線</h2>
+          <div id="timeline" class="timeline"></div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>流式過程</h2>
+          <div class="stream-grid">
+            <div>
+              <h3>批改分析 A 即時輸出</h3>
+              <pre id="review-analyzer-a-stream" class="output stream-output"></pre>
+            </div>
+            <div>
+              <h3>批改分析 B 即時輸出</h3>
+              <pre id="review-analyzer-b-stream" class="output stream-output"></pre>
+            </div>
+            <div class="full-span">
+              <h3>Review Judge 即時輸出</h3>
+              <pre id="review-stream" class="output stream-output"></pre>
+            </div>
+            <div class="full-span">
+              <h3>畫圖 AI 即時輸出</h3>
+              <pre id="diagram-stream" class="output stream-output"></pre>
+            </div>
+            <div class="full-span">
+              <h3>批改後講解狀態 / Debug</h3>
+              <pre id="final-explanation-stream" class="output stream-output">等待批改完成後生成講解。</pre>
+            </div>
+            <div class="full-span">
+              <h3>Python 執行與重試</h3>
+              <pre id="diagram-status" class="output stream-output"></pre>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>批改結果</h2>
+          <pre id="review-result" class="output"></pre>
+        </article>
+
+        <article class="panel">
+          <h2>正誤與方法判定</h2>
+          <pre id="review-summary" class="output"></pre>
+        </article>
+
+        <article class="panel">
+          <h2>標準答案與評分說明</h2>
+          <pre id="reference-answer" class="output"></pre>
+        </article>
+
+        <article class="panel full-width">
+          <h2>畫圖建議</h2>
+          <pre id="diagram-advice" class="output"></pre>
+        </article>
+
+        <article class="panel full-width">
+          <h2>分數判定</h2>
+          <div class="final-explanation-compare">
+            <section>
+              <h3>題目分數規劃</h3>
+              <pre id="score-plan" class="output">尚未生成分數規劃</pre>
+            </section>
+            <section>
+              <h3>最終得分 breakdown</h3>
+              <pre id="score-breakdown" class="output">尚未生成最終得分</pre>
+            </section>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>批改後講解</h2>
+          <div class="final-explanation-compare">
+            <section>
+              <h3>模型原始輸出</h3>
+              <pre id="final-explanation-raw" class="output final-explanation-raw">尚未生成講解</pre>
+            </section>
+            <section>
+              <h3>正規化後文本</h3>
+              <pre id="final-explanation-normalized" class="output final-explanation-raw">尚未生成正規化文本</pre>
+            </section>
+            <section class="full-span">
+              <h3>渲染結果</h3>
+              <div id="final-explanation-rendered" class="explanation-card">
+                <p class="empty">尚未生成講解</p>
+              </div>
+            </section>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>圖形結果</h2>
+          <div id="diagram-container" class="diagram-container">
+            <p class="empty">尚未生成圖形</p>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>追問</h2>
+          <div id="followup-history" class="chat-history"></div>
+          <form id="followup-form" class="followup-form">
+            <textarea id="followup-question" rows="3" placeholder="例如：我這一步為什麼不算分？"></textarea>
+            <div class="actions">
+              <button id="followup-button" type="submit" disabled>送出追問</button>
+            </div>
+          </form>
+          <pre id="followup-stream" class="output stream-output">尚未開始追問</pre>
+        </article>
+      </section>
+    </main>
+
+    <script defer src="/katex.min.js"></script>
+    <script defer src="/auto-render.min.js"></script>
+    <script type="module" src="/review-app.js"></script>
+  </body>
+</html>

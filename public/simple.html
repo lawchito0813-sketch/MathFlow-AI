@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 數學運算簡單版</title>
+    <link rel="stylesheet" href="/katex.min.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page simple-page">
+      <section class="panel">
+        <div class="page-switcher">
+          <a class="mode-link" href="/">AI 解題｜困難版</a>
+          <a class="mode-link active" href="/simple">AI 解題｜簡單版</a>
+          <a class="mode-link" href="/review">學生批改｜困難版</a>
+          <a class="mode-link" href="/review-simple">學生批改｜簡單版</a>
+          <a class="mode-link" href="/paper-review">整卷批改</a>
+          <a class="mode-link" href="/dse-author">DSE 出卷</a>
+        </div>
+        <h1>AI 數學運算簡單版</h1>
+        <p class="subtitle">先標準化題目，再直接解題判斷是否需要畫圖，最後生成學生版講解。</p>
+
+        <form id="solve-form" class="form">
+          <label class="field">
+            <span>API 提供者</span>
+            <select id="provider-select"></select>
+          </label>
+
+          <label class="field">
+            <span>數學題文字</span>
+            <textarea id="text-input" rows="6" placeholder="例如：已知三角形 ABC 中，AB=5，AC=7，夾角 A=60°，求 BC。"></textarea>
+          </label>
+
+          <label class="field">
+            <span>或上傳題目圖片</span>
+            <input id="image-input" type="file" accept="image/*" />
+          </label>
+
+          <div class="actions">
+            <button id="solve-button" type="submit">開始解題</button>
+            <button id="diagram-button" type="button" disabled>生成圖形</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="grid simple-grid">
+        <article class="panel">
+          <h2>流程時間線</h2>
+          <div id="timeline" class="timeline"></div>
+        </article>
+
+        <article class="panel">
+          <h2>Judge 結果</h2>
+          <pre id="judge" class="output"></pre>
+        </article>
+
+        <article class="panel full-width">
+          <h2>最終答案</h2>
+          <pre id="final-answer" class="output"></pre>
+        </article>
+
+        <article class="panel full-width">
+          <h2>畫圖建議</h2>
+          <pre id="diagram-advice" class="output"></pre>
+        </article>
+
+        <article class="panel full-width">
+          <h2>流式過程</h2>
+          <div class="stream-grid simple-stream-grid">
+            <div>
+              <h3>Judge 即時輸出</h3>
+              <pre id="judge-stream" class="output stream-output"></pre>
+            </div>
+            <div>
+              <h3>畫圖 AI 即時輸出</h3>
+              <pre id="diagram-stream" class="output stream-output"></pre>
+            </div>
+            <div class="full-span">
+              <h3>最終講解狀態 / Debug</h3>
+              <pre id="final-explanation-stream" class="output stream-output">本階段採用穩定模式，等待完整講解返回。</pre>
+            </div>
+            <div class="full-span">
+              <h3>Python 執行與重試</h3>
+              <pre id="diagram-status" class="output stream-output"></pre>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>學生版最終講解</h2>
+          <div class="final-explanation-compare">
+            <section>
+              <h3>模型原始輸出</h3>
+              <pre id="final-explanation-raw" class="output final-explanation-raw">尚未生成最終講解</pre>
+            </section>
+            <section>
+              <h3>正規化後文本</h3>
+              <pre id="final-explanation-normalized" class="output final-explanation-raw">尚未生成正規化文本</pre>
+            </section>
+            <section class="full-span">
+              <h3>渲染結果</h3>
+              <div id="final-explanation-rendered" class="explanation-card">
+                <p class="empty">尚未生成最終講解</p>
+              </div>
+            </section>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>圖形結果</h2>
+          <div id="diagram-container" class="diagram-container">
+            <p class="empty">尚未生成圖形</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script defer src="/katex.min.js"></script>
+    <script defer src="/auto-render.min.js"></script>
+    <script type="module" src="/simple-app.js"></script>
+  </body>
+</html>

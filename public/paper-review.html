@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>整卷 PDF 批改</title>
+    <link rel="stylesheet" href="/katex.min.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel">
+        <div class="page-switcher">
+          <a class="mode-link" href="/">AI 解題｜困難版</a>
+          <a class="mode-link" href="/simple">AI 解題｜簡單版</a>
+          <a class="mode-link" href="/review">學生批改｜困難版</a>
+          <a class="mode-link" href="/review-simple">學生批改｜簡單版</a>
+          <a class="mode-link active" href="/paper-review">整卷批改</a>
+          <a class="mode-link" href="/dse-author">DSE 出卷</a>
+        </div>
+        <h1>整卷 PDF 批改</h1>
+        <p class="subtitle">上傳 PDF 後直接啟動整卷批改，完整顯示 API 呼叫、SSE 事件、模型流式輸出、分數判定與整卷報告。</p>
+
+        <form id="paper-review-form" class="form">
+          <label class="field">
+            <span>API 提供者</span>
+            <select id="provider-select"></select>
+          </label>
+
+          <label class="field">
+            <span>上傳 PDF</span>
+            <input id="pdf-file" type="file" accept="application/pdf,.pdf" />
+          </label>
+
+          <div class="actions">
+            <button id="paper-review-button" type="submit">開始整卷批改</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="grid paper-grid">
+        <article class="panel">
+          <h2>流程時間線</h2>
+          <details class="paper-section-toggle">
+            <summary>展開流程時間線</summary>
+            <div id="timeline" class="timeline"></div>
+          </details>
+        </article>
+
+        <article class="panel">
+          <h2>API / 事件原始流</h2>
+          <details class="paper-section-toggle">
+            <summary>展開原始事件流</summary>
+            <pre id="raw-events" class="output raw-events"></pre>
+          </details>
+        </article>
+
+        <article class="panel full-width">
+          <h2>模型流式輸出</h2>
+          <div class="paper-model-grid">
+            <section>
+              <h3>paper index</h3>
+              <div id="paper-index-model-calls" class="paper-model-list"></div>
+            </section>
+            <section>
+              <h3>整卷報告</h3>
+              <div id="paper-report-model-calls" class="paper-model-list"></div>
+            </section>
+            <section class="full-span">
+              <h3>逐題 routing / review</h3>
+              <div id="question-model-calls" class="paper-question-cards"></div>
+            </section>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>索引與分組</h2>
+          <details class="paper-section-toggle">
+            <summary>展開索引與分組詳細資料</summary>
+            <div class="paper-two-col">
+              <section>
+                <h3>paper_index_done</h3>
+                <pre id="paper-index" class="output"></pre>
+              </section>
+              <section>
+                <h3>paper_groups_built</h3>
+                <pre id="paper-groups" class="output"></pre>
+              </section>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel full-width">
+          <h2>逐題進度</h2>
+          <pre id="paper-questions" class="output"></pre>
+        </article>
+
+        <article class="panel full-width">
+          <h2>逐題總表</h2>
+          <div id="paper-score-summary" class="paper-score-summary-wrap">
+            <p class="empty">尚未生成逐題總表</p>
+          </div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>逐題分數卡</h2>
+          <div id="paper-question-score-cards" class="paper-score-list"></div>
+        </article>
+
+        <article class="panel full-width">
+          <h2>整卷總報告</h2>
+          <div id="paper-report-summary" class="paper-report-card">
+            <p class="empty">尚未生成整卷報告</p>
+          </div>
+          <details class="paper-raw-toggle">
+            <summary>查看模型原文</summary>
+            <pre id="paper-report" class="output"></pre>
+          </details>
+        </article>
+
+        <article class="panel full-width">
+          <h2>錯誤 / 階段重試</h2>
+          <pre id="paper-errors" class="output"></pre>
+        </article>
+      </section>
+
+      <div id="image-lightbox" class="image-lightbox" hidden>
+        <button id="image-lightbox-close" class="image-lightbox-close" type="button">關閉</button>
+        <img id="image-lightbox-img" class="image-lightbox-img" alt="放大題目圖片" />
+      </div>
+
+      <script type="module" src="/paper-review-app.js"></script>
+    </main>
+  </body>
+</html>

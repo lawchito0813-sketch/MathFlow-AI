@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSE 出卷工作台</title>
+    <link rel="stylesheet" href="/katex.min.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page page-wide dse-workbench-page">
+      <div class="dse-floating-actions">
+        <button id="open-settings-button" type="button">設定</button>
+        <button id="open-activity-button" type="button">活動面板</button>
+      </div>
+
+      <section class="dse-topbar panel dse-compact-panel">
+        <div class="page-switcher">
+          <a class="mode-link" href="/">AI 解題｜困難版</a>
+          <a class="mode-link" href="/simple">AI 解題｜簡單版</a>
+          <a class="mode-link" href="/review">學生批改｜困難版</a>
+          <a class="mode-link" href="/review-simple">學生批改｜簡單版</a>
+          <a class="mode-link" href="/paper-review">整卷批改</a>
+          <a class="mode-link active" href="/dse-author">DSE 出卷</a>
+        </div>
+      </section>
+
+      <div id="settings-modal" class="dse-modal" hidden>
+        <div class="dse-modal-backdrop" data-close-modal="settings"></div>
+        <section class="dse-modal-panel panel">
+          <div class="dse-section-head">
+            <h2>DSE 出卷設定</h2>
+            <button id="close-settings-button" type="button">關閉</button>
+          </div>
+
+          <form id="author-form" class="form dse-form-grid">
+            <label class="field">
+              <span>API 提供者</span>
+              <select id="provider-select"></select>
+            </label>
+
+            <label class="field">
+              <span>生成模式</span>
+              <select id="mode-select">
+                <option value="single">單題</option>
+                <option value="set">題組</option>
+                <option value="paper">整卷</option>
+              </select>
+            </label>
+
+            <label class="field" id="question-type-field">
+              <span>題型</span>
+              <select id="question-type-select">
+                <option value="long">Long Q</option>
+                <option value="mc">MC</option>
+                <option value="mixed">Mixed</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>卷別</span>
+              <select id="paper-type-select">
+                <option value="paper1">Paper 1</option>
+                <option value="paper2">Paper 2</option>
+                <option value="full">未定（稍後追問 Paper 1 / Paper 2）</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>語言</span>
+              <select id="language-select">
+                <option value="bilingual">中英雙語</option>
+                <option value="zh-HK">繁中</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>難度</span>
+              <select id="difficulty-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="5*">5*</option>
+                <option value="5**">5**</option>
+              </select>
+            </label>
+
+            <label class="field" id="question-count-field">
+              <span id="question-count-label">題量</span>
+              <input id="question-count-input" type="number" min="1" value="1" />
+            </label>
+
+            <label class="field" id="marks-field">
+              <span>每題分數</span>
+              <input id="marks-input" type="number" min="1" value="4" />
+            </label>
+
+            <label class="field full-width">
+              <span>覆蓋課題（用逗號分隔）</span>
+              <input id="topics-input" type="text" placeholder="例如：quadratic equations, coordinate geometry, probability" />
+            </label>
+
+            <label class="field full-width">
+              <span>避免課題（用逗號分隔）</span>
+              <input id="avoid-topics-input" type="text" placeholder="例如：circle theorems" />
+            </label>
+
+            <label class="field">
+              <span>需圖程度</span>
+              <select id="diagram-select">
+                <option value="optional">可選</option>
+                <option value="required">必須</option>
+                <option value="forbidden">不要圖</option>
+              </select>
+            </label>
+
+            <label class="field checkbox-field">
+              <span>真實情境包裝</span>
+              <input id="real-world-checkbox" type="checkbox" />
+            </label>
+
+            <label class="field full-width">
+              <span>老師目標</span>
+              <textarea id="teacher-goal-input" rows="3" placeholder="例如：想訓練學生同時處理 coordinate geometry 同 quadratic。"></textarea>
+            </label>
+
+            <label class="field full-width">
+              <span>其他限制</span>
+              <textarea id="constraints-input" rows="4" placeholder="例如：答案不要有很醜的數、想要一題有圖、一題無圖。"></textarea>
+            </label>
+
+            <label class="field full-width">
+              <span>老師消息</span>
+              <textarea id="author-followup-input" rows="3" placeholder="直接對 agent 說：再驗算一次、把第 1 題常數改成 12、重寫 mark scheme、補一個 diagram…"></textarea>
+            </label>
+            <div class="actions full-width">
+              <button id="author-followup-button" type="submit">發送消息</button>
+              <button id="generate-button" type="submit">開始新一輪</button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div id="activity-modal" class="dse-modal" hidden>
+        <div class="dse-modal-backdrop" data-close-modal="activity"></div>
+        <section class="dse-modal-panel panel dse-activity-modal-panel">
+          <div class="dse-section-head">
+            <h2>活動面板</h2>
+            <button id="close-activity-button" type="button">關閉</button>
+          </div>
+          <div class="dse-activity-stack">
+            <section>
+              <h3>流程時間線</h3>
+              <div id="timeline" class="timeline"></div>
+            </section>
+
+            <section>
+              <h3>模型與工具活動</h3>
+              <div class="paper-model-grid dse-activity-grid">
+                <section>
+                  <h4>模型流式輸出</h4>
+                  <div id="author-model-calls" class="paper-model-list"></div>
+                </section>
+                <section>
+                  <h4>工具呼叫</h4>
+                  <div id="author-tool-calls" class="paper-model-list"></div>
+                </section>
+              </div>
+            </section>
+
+            <section>
+              <h3>工具 / 事件原始流</h3>
+              <pre id="raw-events" class="output raw-events"></pre>
+            </section>
+          </div>
+        </section>
+      </div>
+
+      <section class="dse-workbench-layout" id="dse-workbench-layout">
+        <article class="panel dse-transcript-panel dse-workbench-pane">
+          <div class="dse-panel-head dse-workbench-head">
+            <h2>Agent Workbench</h2>
+            <div class="dse-session-pill" id="dse-session-pill">always on</div>
+          </div>
+
+          <div id="author-chat-history" class="dse-transcript"></div>
+
+          <div id="author-pending-indicator" class="dse-pending-indicator" hidden>主 Agent 正在處理…</div>
+
+          <form id="author-followup-form" class="followup-form dse-followup-form dse-chat-inputbar">
+            <textarea id="author-followup-input-inline" rows="3" placeholder="繼續對 agent 說：再驗算一次、修改題目條件、重新出一題、補作圖…"></textarea>
+            <div class="actions dse-chat-actions">
+              <button id="author-inline-send-button" type="submit" aria-label="發送消息">送出</button>
+            </div>
+          </form>
+        </article>
+
+        <div class="dse-splitter" id="dse-splitter" role="separator" aria-label="調整左右面板寬度" aria-orientation="vertical" tabindex="0"></div>
+
+        <section class="dse-right-pane">
+          <article class="panel full-width dse-drafts-pane">
+            <div class="dse-section-head">
+              <h2 id="draft-section-title">生成草稿</h2>
+              <div class="actions">
+                <button id="download-paper-text-button" type="button">下載 TXT</button>
+                <button id="download-paper-json-button" type="button">下載 JSON</button>
+              </div>
+            </div>
+            <div id="author-draft-list" class="paper-question-cards"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/dse-author-app.js"></script>
+  </body>
+</html>
