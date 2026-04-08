@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+.npmrc
+.claude-server.log
+.env
+.env.*
+!.env.example
+*.log
